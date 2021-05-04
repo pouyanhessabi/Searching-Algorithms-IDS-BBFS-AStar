@@ -1,12 +1,13 @@
 class Node:
-    def __init__(self, location: tuple, last_move: str = None, parent = None, depth: int = 0):
+    def __init__(self, location: tuple, last_move: str = None, state: str = "n", parent = None, cost : int = 0):
         self.location = location
         self.parent = parent
+        self.state = state
         self.last_move = last_move
         if parent:
-            self.depth = parent.depth + 1
+            self.cost = parent.cost + cost
         else:
-            self.depth = 0
+            self.cost = cost
 
 environment=[]
 queue = []
@@ -15,6 +16,19 @@ robot_location=(0,0)
 butter_location=[]
 goal_location=[]
 forbidden_location=[]
+def fill_node_state(location :tuple):
+    if(location in butter_location):
+        return "b"
+    elif (location in goal_location):
+        return "p"
+    else:
+        return "n"
+
+def fill_node_cost(location :tuple):
+    return int(environment[location[0]][location[1]][0])
+
+
+
 
 def generate_children(node : Node):
     children = []
@@ -24,20 +38,20 @@ def generate_children(node : Node):
     right = (node.location[0], node.location[1]+1)
     if(up[0]>=0 and up[0]< x and up[1]>= 0 and up[1]< y):
         if(not(up in forbidden_location)):
-            children.append(Node(up,"u"))
+            children.append(Node(up,"u",fill_node_location(up),node,fill_node_cost(up)))
 
     if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
         if (not (down in forbidden_location)):
-            children.append(Node(down, "d"))
+            children.append(Node(down,"d",fill_node_location(down),node,fill_node_cost(down)))
 
     if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
         if (not (left in forbidden_location)):
-            children.append(Node(left,"l"))
+            children.append(Node(left,"l",fill_node_location(left),node,fill_node_cost(left)))
 
     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
         if (not (right in forbidden_location)):
-            children.append(Node(right, "r"))
-    print(len(children))
+            children.append(Node(right,"r",fill_node_location(right),node,fill_node_cost(right)))
+    print(children[2].cost)
 
 
 
@@ -60,7 +74,8 @@ for i in range(x):
 
 # for limit in range((x*y)):
 
-stat=Node(robot_location)
+stat=Node(robot_location,None,"n",None,fill_node_cost(robot_location))
+print(stat.cost)
 generate_children(stat)
 
 print(robot_location)
