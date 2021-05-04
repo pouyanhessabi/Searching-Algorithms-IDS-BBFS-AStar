@@ -24,19 +24,19 @@ def generate_children(node : Node):
     right = (node.location[0], node.location[1]+1)
     if(up[0]>=0 and up[0]< x and up[1]>= 0 and up[1]< y):
         if(not(up in forbidden_location)):
-            children.append(up)
+            children.append(Node(up,"u"))
 
     if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
         if (not (down in forbidden_location)):
-            children.append(down)
+            children.append(Node(down, "d"))
 
     if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
         if (not (left in forbidden_location)):
-            children.append(left)
+            children.append(Node(left,"l"))
 
     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
         if (not (right in forbidden_location)):
-            children.append(right)
+            children.append(Node(right, "r"))
     print(len(children))
 
 
