@@ -38,19 +38,19 @@ def generate_children(node : Node):
     right = (node.location[0], node.location[1]+1)
     if(up[0]>=0 and up[0]< x and up[1]>= 0 and up[1]< y):
         if(not(up in forbidden_location)):
-            children.append(Node(up,"u",fill_node_location(up),node,fill_node_cost(up)))
+            children.append(Node(up,"u",fill_node_state(up),node,fill_node_cost(up)))
 
     if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
         if (not (down in forbidden_location)):
-            children.append(Node(down,"d",fill_node_location(down),node,fill_node_cost(down)))
+            children.append(Node(down,"d",fill_node_state(down),node,fill_node_cost(down)))
 
     if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
         if (not (left in forbidden_location)):
-            children.append(Node(left,"l",fill_node_location(left),node,fill_node_cost(left)))
+            children.append(Node(left,"l",fill_node_state(left),node,fill_node_cost(left)))
 
     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
         if (not (right in forbidden_location)):
-            children.append(Node(right,"r",fill_node_location(right),node,fill_node_cost(right)))
+            children.append(Node(right,"r",fill_node_state(right),node,fill_node_cost(right)))
     print(children[2].cost)
 
 
