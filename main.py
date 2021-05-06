@@ -1,20 +1,22 @@
 class Node:
-    def __init__(self, location: tuple, last_move: str = None, state: str = "n", parent = None, cost : int = 0):
+    def __init__(self, location: tuple, last_move: str = None, state: str = "n", parent = None, cost : int = 0, depth :int =0 ):
         self.location = location
         self.parent = parent
         self.state = state
         self.last_move = last_move
         if parent:
             self.cost = parent.cost + cost
+            self.depth = parent.depth + 1
         else:
             self.cost = cost
+            self.depth = 0
 
-environment=[]
-queue = []
-tree=[]
+environment = []
+frontier = []
+tree = []
 robot_location=(0,0)
-butter_location=[]
-goal_location=[]
+butter_location = []
+goal_location = []
 forbidden_location=[]
 def fill_node_state(location :tuple):
     if(location in butter_location):
@@ -27,7 +29,21 @@ def fill_node_state(location :tuple):
 def fill_node_cost(location :tuple):
     return int(environment[location[0]][location[1]][0])
 
+    # A function to perform a Depth-Limited search
+    # from given source 'src'
+# def DFS(node : Node,maxDepth):
+#     if(len(frontier)==0):
+#         return
+#     else:
+#         generate_children(node)
+#         DFS(maxDepth)
 
+
+
+# def IDS(src, target, limit):
+#     for i in range(limit):
+#         DFS(src, target, i)
+#     return False
 
 
 def generate_children(node : Node):
@@ -52,6 +68,7 @@ def generate_children(node : Node):
         if (not (right in forbidden_location)):
             children.append(Node(right,"r",fill_node_state(right),node,fill_node_cost(right)))
     print(children[2].cost)
+    return children
 
 
 
@@ -72,11 +89,13 @@ for i in range(x):
 
 
 
-# for limit in range((x*y)):
+# for limit in range(1,(x*y)):
 
-stat=Node(robot_location,None,"n",None,fill_node_cost(robot_location))
-print(stat.cost)
-generate_children(stat)
+
+start=Node(robot_location,None,"n",None,fill_node_cost(robot_location))
+print(start.cost)
+ch=generate_children(start)
+
 
 print(robot_location)
 print(butter_location)
