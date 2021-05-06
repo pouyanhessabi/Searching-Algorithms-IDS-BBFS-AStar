@@ -29,22 +29,30 @@ def fill_node_state(location :tuple):
 def fill_node_cost(location :tuple):
     return int(environment[location[0]][location[1]][0])
 
-    # A function to perform a Depth-Limited search
-    # from given source 'src'
-# def DFS(node : Node,maxDepth):
-#     if(len(frontier)==0):
-#         return
-#     else:
-#         generate_children(node)
-#         DFS(maxDepth)
+
+def DFS(node : Node,maxDepth):
+    if(len(frontier)==0 and len(tree) != 0 ):
+        return
+    else:
+        ch=generate_children(node)
+        for i in range(len(ch)):
+            if(ch[i].depth<=maxDepth and (not (ch[i] in tree))):
+                # print("yesssssssss")
+                frontier.append(ch[i])
+        nd=frontier.pop()
+        tree.append(nd)
+        DFS(nd,maxDepth)
 
 
 
-# def IDS(src, target, limit):
-#     for i in range(limit):
-#         DFS(src, target, i)
-#     return False
-
+def IDS(root : Node, limit):
+    for i in range(limit):
+        tree.clear()
+        frontier.append(root)
+        DFS(root,i)
+        for i in range(len(tree)):
+            print(tree[i].location)
+        print("________________")
 
 def generate_children(node : Node):
     children = []
@@ -67,7 +75,6 @@ def generate_children(node : Node):
     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
         if (not (right in forbidden_location)):
             children.append(Node(right,"r",fill_node_state(right),node,fill_node_cost(right)))
-    print(children[2].cost)
     return children
 
 
@@ -93,12 +100,17 @@ for i in range(x):
 
 
 start=Node(robot_location,None,"n",None,fill_node_cost(robot_location))
-print(start.cost)
-ch=generate_children(start)
+IDS(start,3)
 
 
-print(robot_location)
-print(butter_location)
-print(goal_location)
-print(forbidden_location)
-print(environment)
+
+
+# print(start.cost)
+# ch=generate_children(start)
+#
+#
+# print(robot_location)
+# print(butter_location)
+# print(goal_location)
+# print(forbidden_location)
+# print(environment)
