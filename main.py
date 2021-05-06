@@ -34,13 +34,27 @@ def DFS(node : Node,maxDepth):
     if(len(frontier)==0 and len(tree) != 0 ):
         return
     else:
-        ch=generate_children(node)
-        for i in range(len(ch)):
-            if(ch[i].depth<=maxDepth and (not (ch[i] in tree))):
-                # print("yesssssssss")
-                frontier.append(ch[i])
-        nd=frontier.pop()
+        nd = frontier.pop()
         tree.append(nd)
+        ch=generate_children(nd)
+        for i in range(len(ch)):
+            condition=True
+            # print(ch[i].location," childerenn")
+            if(ch[i].depth<=maxDepth):
+                for j in range(len(tree)):
+                    if (ch[i].location == tree[j].location ):
+                        if(ch[i].cost < tree[j].cost):
+                            tree.pop(j)
+                        else:
+                            condition = False
+                        break
+                if (condition):
+                    print("yeeeeeeee")
+                    frontier.append(ch[i])
+        # print("___________________")
+        # for i in range(len(frontier)):
+        #     print(frontier[i].location, "frontier", maxDepth,node.location)
+        # print("___________________________")
         DFS(nd,maxDepth)
 
 
@@ -100,7 +114,7 @@ for i in range(x):
 
 
 start=Node(robot_location,None,"n",None,fill_node_cost(robot_location))
-IDS(start,3)
+IDS(start,4)
 
 
 
