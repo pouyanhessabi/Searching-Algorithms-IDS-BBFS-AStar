@@ -18,6 +18,7 @@ robot_location=(0,0)
 butter_location = []
 goal_location = []
 forbidden_location=[]
+path=[]
 # def fill_node_state(location :tuple):
 #     if(location in butter_location):
 #         return "b"
@@ -26,48 +27,62 @@ forbidden_location=[]
 #     else:
 #         return "n"
 #
+def get_path(node : Node):
+    nd=node
+    while(nd.parnet!=None):
+        path.append(node.last_move)
+        nd=node.parent
+
+
 def fill_node_cost(location :tuple):
     return int(environment[location[0]][location[1]][0])
-#
-#
-# def DFS(node : Node,maxDepth):
-#     if(len(frontier)==0 and len(tree) != 0 ):
-#         return
-#     else:
-#         nd = frontier.pop()
-#         tree.append(nd)
-#         ch=generate_children(nd)
-#         for i in range(len(ch)):
-#             condition=True
-#             # print(ch[i].location," childerenn")
-#             if(ch[i].depth<=maxDepth):
-#                 for j in range(len(tree)):
-#                     if (ch[i].location == tree[j].location ):
-#                         if(ch[i].cost < tree[j].cost):
-#                             tree.pop(j)
-#                         else:
-#                             condition = False
-#                         break
-#                 if (condition):
-#                     print("yeeeeeeee")
-#                     frontier.append(ch[i])
-#         # print("___________________")
-#         # for i in range(len(frontier)):
-#         #     print(frontier[i].location, "frontier", maxDepth,node.location)
-#         # print("___________________________")
-#         DFS(nd,maxDepth)
-#
-#
-#
-# def IDS(root : Node, limit):
-#     for i in range(limit):
-#         tree.clear()
-#         frontier.append(root)
-#         DFS(root,i)
-#         for i in range(len(tree)):
-#             print(tree[i].location)
-#         print("________________")
-#
+
+
+def check_goal(node : Node):
+    for i in range(len(node.butter_loc)):
+        if(node.butter_loc[i] in goal_location):
+            get_path(node)
+
+
+def DFS(node : Node,maxDepth):
+    if(len(frontier)==0 and len(tree) != 0 ):
+        return
+    else:
+        nd = frontier.pop()
+        tree.append(nd)
+        ch=generate_children(nd)
+        for i in range(len(ch)):
+            condition=True
+            # print(ch[i].location," childerenn")
+            if(ch[i].depth<=maxDepth):
+                for j in range(len(tree)):
+                    if (ch[i].robot_loc == tree[j].robot_loc and set(ch[i].butter_loc) == set(tree[j].butter_loc)):
+                        if(ch[i].cost < tree[j].cost):
+                            tree.pop(j)
+                        else:
+                            condition = False
+                        break
+                if (condition):
+                    # print("yeeeeeeee")
+                    frontier.append(ch[i])
+        # print("___________________")
+        # for i in range(len(frontier)):
+        #     print(frontier[i].location, "frontier", maxDepth,node.location)
+        # print("___________________________")
+        DFS(nd,maxDepth)
+
+
+
+def IDS(root : Node, limit):
+    for i in range(limit):
+        tree.clear()
+        frontier.append(root)
+        DFS(root,i)
+        for i in range(len(tree)):
+            check_goal(tree[i])
+            print(tree[i].butter_loc, tree[i].robot_loc, tree[i].cost)
+        print("________________")
+
 def generate_children(node : Node):
     children = []
     robot_neighbors=[]
@@ -115,7 +130,7 @@ def generate_children(node : Node):
                 b_loc=(up[0]-1, up[1])
                 action="u"
             elif (i == down):
-                b_loc=(down+1, down[1])
+                b_loc=(down[0]+1, down[1])
                 action="d"
             elif (i == left):
                 b_loc= (left[0], left[1]-1)
@@ -154,14 +169,14 @@ for i in range(x):
 
 
 start=Node(robot_location,butter_location,None,None,int(environment[robot_location[0]][robot_location[1]][0]))
-ch=generate_children(start)
-for i in range (len(ch)):
-    print(ch[i].butter_loc,ch[i].robot_loc,ch[i].cost)
+# ch=generate_children(start)
+# for i in range (len(ch)):
+#     print(ch[i].butter_loc,ch[i].robot_loc,ch[i].cost)
 
-# IDS(start,4)
+IDS(start,12)
 
 
-
+print(path)
 
 # print(start.cost)
 #
