@@ -1,8 +1,8 @@
 class Node:
-    def __init__(self, environment: list, last_move: str = None, state: str = "n", parent = None, cost : int = 0, depth :int =0 ):
-        self.environment = environment
+    def __init__(self,robot_loc: tuple, butter_loc: list, last_move: str = None, parent = None, cost : int = 0, depth :int =0 ):
+        self.robot_loc = robot_loc
+        self.butter_loc=butter_loc
         self.parent = parent
-        self.state = state
         self.last_move = last_move
         if parent:
             self.cost = parent.cost + cost
@@ -26,8 +26,8 @@ forbidden_location=[]
 #     else:
 #         return "n"
 #
-# def fill_node_cost(location :tuple):
-#     return int(environment[location[0]][location[1]][0])
+def fill_node_cost(location :tuple):
+    return int(environment[location[0]][location[1]][0])
 #
 #
 # def DFS(node : Node,maxDepth):
@@ -68,28 +68,68 @@ forbidden_location=[]
 #             print(tree[i].location)
 #         print("________________")
 #
-# def generate_children(node : Node):
-#     children = []
-#     up = (node.location[0]-1, node.location[1])
-#     down = (node.location[0]+1, node.location[1])
-#     left = (node.location[0], node.location[1]-1)
-#     right = (node.location[0], node.location[1]+1)
-#     if(up[0]>=0 and up[0]< x and up[1]>= 0 and up[1]< y):
-#         if(not(up in forbidden_location)):
-#             children.append(Node(up,"u",fill_node_state(up),node,fill_node_cost(up)))
-#
-#     if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
-#         if (not (down in forbidden_location)):
-#             children.append(Node(down,"d",fill_node_state(down),node,fill_node_cost(down)))
-#
-#     if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
-#         if (not (left in forbidden_location)):
-#             children.append(Node(left,"l",fill_node_state(left),node,fill_node_cost(left)))
-#
-#     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
-#         if (not (right in forbidden_location)):
-#             children.append(Node(right,"r",fill_node_state(right),node,fill_node_cost(right)))
-#     return children
+def generate_children(node : Node):
+    children = []
+    robot_neighbors=[]
+    neighbor_butter_location=[]
+
+    up = (node.robot_loc[0]-1, node.robot_loc[1])
+    robot_neighbors.append(up)
+    down = (node.robot_loc[0]+1, node.robot_loc[1])
+    robot_neighbors.append(down)
+    left = (node.robot_loc[0], node.robot_loc[1]-1)
+    robot_neighbors.append(left)
+    right = (node.robot_loc[0], node.robot_loc[1]+1)
+    robot_neighbors.append(right)
+    for i in range(4):
+        for j in range(len(node.butter_loc)):
+            if (robot_neighbors[i]==node.butter_loc[j]):
+                neighbor_butter_location.append(robot_neighbors[i])
+
+
+    if(up[0]>=0 and up[0]< x and up[1]>= 0 and up[1]< y):
+        if(not(up in forbidden_location)):
+            if(not (up in neighbor_butter_location)):
+                children.append(Node(up,node.butter_loc,"u",node,fill_node_cost(up)))
+
+    if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
+        if (not (down in forbidden_location)):
+            if (not (down in neighbor_butter_location)):
+
+                children.append(Node(down,node.butter_loc,"d",node,fill_node_cost(down)))
+
+    if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
+        if (not (left in forbidden_location)):
+            if (not (left in neighbor_butter_location)):
+                children.append(Node(left,node.butter_loc,"l",node,fill_node_cost(left)))
+
+    if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
+        if (not (right in forbidden_location)):
+            if (not (right in neighbor_butter_location)):
+                children.append(Node(right,node.butter_loc,"r",node,fill_node_cost(right)))
+
+
+    if(len(neighbor_butter_location)!=0):
+        for i in neighbor_butter_location:
+            if (i == up):
+                b_loc=(up[0]-1, up[1])
+                action="u"
+            elif (i == down):
+                b_loc=(down+1, down[1])
+                action="d"
+            elif (i == left):
+                b_loc= (left[0], left[1]-1)
+                action="l"
+            elif (i == right):
+                action="r"
+                b_loc=(right[0], right[1]+1)
+            if (b_loc[0] >= 0 and b_loc[0] < x and b_loc[1] >= 0 and b_loc[1] < y):
+                if (not (b_loc in forbidden_location) and not (b_loc in node.butter_loc)):
+                        temp=node.butter_loc.copy()
+                        temp.remove(i)
+                        temp.append(b_loc)
+                        children.append(Node(i, temp, action, node, fill_node_cost(i)))
+    return children
 
 
 
@@ -113,15 +153,17 @@ for i in range(x):
 # for limit in range(1,(x*y)):
 
 
-start=Node(environment,None,"n",None,0)
-print(start.environment[0])
+start=Node(robot_location,butter_location,None,None,int(environment[robot_location[0]][robot_location[1]][0]))
+ch=generate_children(start)
+for i in range (len(ch)):
+    print(ch[i].butter_loc,ch[i].robot_loc,ch[i].cost)
+
 # IDS(start,4)
 
 
 
 
 # print(start.cost)
-# ch=generate_children(start)
 #
 #
 # print(robot_location)
