@@ -38,7 +38,7 @@ def read_from_file(file_name : str):
             elif (environment[i][j].find('x') != -1):
                 forbidden_location.append((i, j))
 
-
+# def write_on_file
 def get_path(node : Node):
     nd=node
     # i=0
@@ -108,6 +108,7 @@ def IDS(root : Node):
     end=False
     i=0
     while (True):
+        previous_tree_len=len(tree)
         tree.clear()
         frontier.append(root)
         DFS(i)
@@ -125,6 +126,10 @@ def IDS(root : Node):
                 else:
                     end=True
         i+=1
+        now_tree_len = len(tree)
+        print(len(tree),i)
+        if(now_tree_len==previous_tree_len):
+            break
         if end== True:
             break
             # print(tree[i].butter_loc, tree[i].robot_loc, tree[i].depth)
@@ -211,6 +216,7 @@ start=Node(robot_location,butter_location,None,None,int(environment[robot_locati
 
 IDS(start)
 
-
-print(path)
-print(len(path))
+if(goal_location==0):
+    print(path)
+else:
+    print("can’t pass the butter")
