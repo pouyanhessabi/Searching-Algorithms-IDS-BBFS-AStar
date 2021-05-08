@@ -19,14 +19,26 @@ butter_location = []
 goal_location = []
 forbidden_location=[]
 path=[]
-# def fill_node_state(location :tuple):
-#     if(location in butter_location):
-#         return "b"
-#     elif (location in goal_location):
-#         return "p"
-#     else:
-#         return "n"
-#
+x=0
+y=0
+def read_from_file():
+    global x,y,robot_location
+    f = open("test5.txt", "r")
+    x, y= map(int, f.readline().split())
+    for i in range(x):
+        environment.append(f.readline().split())
+    for i in range(x):
+        for j in range(y):
+            if (environment[i][j].find('r') != -1):
+                robot_location = (i, j)
+            elif (environment[i][j].find('b') != -1):
+                butter_location.append((i, j))
+            elif (environment[i][j].find('p') != -1):
+                goal_location.append((i, j))
+            elif (environment[i][j].find('x') != -1):
+                forbidden_location.append((i, j))
+
+
 def get_path(node : Node):
     nd=node
     # i=0
@@ -64,7 +76,7 @@ def check_goal(node : Node):
     return None
 
 
-def DFS(node : Node,maxDepth):
+def DFS(maxDepth):
     if(len(frontier)==0 and len(tree) != 0 ):
         return
     else:
@@ -88,30 +100,31 @@ def DFS(node : Node,maxDepth):
         # for i in range(len(frontier)):
         #     print(frontier[i].location, "frontier", maxDepth,node.location)
         # print("___________________________")
-        DFS(nd,maxDepth)
+        DFS(maxDepth)
 
 
 
-def IDS(root : Node, limit):
+def IDS(root : Node):
     end=False
-    new_root=Node
-    for i in range(limit+1):
+    i=0
+    while (True):
         tree.clear()
         frontier.append(root)
-        DFS(root,i)
-        for i in range(len(tree)):
-            new_root=check_goal(tree[i])
+        DFS(i)
+        for j in range(len(tree)):
+            new_root=check_goal(tree[j])
             # print(new_root)
             if (new_root != None):
                 root = new_root
                 print(root.robot_loc,root.butter_loc,goal_location)
                 print("yesssssssss")
                 if(len(goal_location)>0):
-                    IDS(new_root, 14)
+                    IDS(new_root)
+                    end=True
                     break
                 else:
                     end=True
-
+        i+=1
         if end== True:
             break
             # print(tree[i].butter_loc, tree[i].robot_loc, tree[i].depth)
@@ -187,31 +200,15 @@ def generate_children(node : Node):
 
 
 
-x,y= map(int, input().split())
-for i in range(x):
-    environment.append(input().split())
-for i in range(x):
-    for j in range(y):
-        if (environment[i][j].find('r') != -1):
-            robot_location=(i,j)
-        elif (environment[i][j].find('b') != -1):
-            butter_location.append((i,j))
-        elif (environment[i][j].find('p') != -1):
-            goal_location.append((i,j))
-        elif (environment[i][j].find('x') != -1):
-            forbidden_location.append((i,j))
-
 
 
 # for limit in range(1,(x*y)):
 
+read_from_file()
 
 start=Node(robot_location,butter_location,None,None,int(environment[robot_location[0]][robot_location[1]][0]))
-# ch=generate_children(start)
-# for i in range (len(ch)):
-#     print(ch[i].butter_loc,ch[i].robot_loc,ch[i].cost)
 
-IDS(start,12)
+IDS(start)
 
 
 print(path)
