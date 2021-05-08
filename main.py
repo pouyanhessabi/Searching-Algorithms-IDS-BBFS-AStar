@@ -54,9 +54,14 @@ def check_goal(node : Node):
         if(node.butter_loc[i] in goal_location):
             # print(node.butter_loc[i])
             # print(node.parent.butter_loc)
-            get_path(node)
             goal_location.remove(node.butter_loc[i])
+            node.butter_loc.remove(node.butter_loc[i])
+            if(len(goal_location)==0):
+                get_path(node)
 
+            # start = Node(node.robot_loc, node., None, None,node.cost)
+            return node
+    return None
 
 
 def DFS(node : Node,maxDepth):
@@ -89,15 +94,24 @@ def DFS(node : Node,maxDepth):
 
 def IDS(root : Node, limit):
     end=False
+    new_root=Node
     for i in range(limit+1):
         tree.clear()
         frontier.append(root)
         DFS(root,i)
         for i in range(len(tree)):
-            if(len(goal_location)>0):
-                check_goal(tree[i])
-            else:
-                end=True
+            new_root=check_goal(tree[i])
+            # print(new_root)
+            if (new_root != None):
+                root = new_root
+                print(root.robot_loc,root.butter_loc,goal_location)
+                print("yesssssssss")
+                if(len(goal_location)>0):
+                    IDS(new_root, 14)
+                    break
+                else:
+                    end=True
+
         if end== True:
             break
             # print(tree[i].butter_loc, tree[i].robot_loc, tree[i].depth)
@@ -202,12 +216,3 @@ IDS(start,12)
 
 print(path)
 print(len(path))
-
-# print(start.cost)
-#
-#
-# print(robot_location)
-# print(butter_location)
-# print(goal_location)
-# print(forbidden_location)
-# print(environment)
