@@ -21,9 +21,9 @@ forbidden_location=[]
 path=[]
 x=0
 y=0
-def read_from_file():
+def read_from_file(file_name : str):
     global x,y,robot_location
-    f = open("test5.txt", "r")
+    f = open(file_name, "r")
     x, y= map(int, f.readline().split())
     for i in range(x):
         environment.append(f.readline().split())
@@ -117,7 +117,7 @@ def IDS(root : Node):
             if (new_root != None):
                 root = new_root
                 print(root.robot_loc,root.butter_loc,goal_location)
-                print("yesssssssss")
+
                 if(len(goal_location)>0):
                     IDS(new_root)
                     end=True
@@ -203,8 +203,9 @@ def generate_children(node : Node):
 
 
 # for limit in range(1,(x*y)):
+file_name=input()+".txt"
 
-read_from_file()
+read_from_file(file_name)
 
 start=Node(robot_location,butter_location,None,None,int(environment[robot_location[0]][robot_location[1]][0]))
 
