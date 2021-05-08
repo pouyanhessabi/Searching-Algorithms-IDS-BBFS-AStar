@@ -19,6 +19,8 @@ butter_location = []
 goal_location = []
 forbidden_location=[]
 path=[]
+final_cost=0
+final_depth=0
 x=0
 y=0
 def read_from_file(file_name : str):
@@ -38,23 +40,20 @@ def read_from_file(file_name : str):
             elif (environment[i][j].find('x') != -1):
                 forbidden_location.append((i, j))
 
-# def write_on_file
+def write_on_file(file_name):
+    f = open(file_name, "w")
+    for i in range(len(path),0,-1):
+        f.write(path[i-1]+" ")
+    f.write("\n")
+    f.write(str(final_cost)+"\n")
+    f.write(str(final_depth)+"\n")
 def get_path(node : Node):
     nd=node
-    # i=0
-    # print(node.robot_loc,"goal")
-    # while(i<nd.depth):
-    #     path.append(nd.last_move)
-    #     nd=node.parent
-    #     print(nd.robot_loc, "parent")
-    #     print(nd.parent.robot_loc,"par par")
-    #     i+=1
     if(nd.depth==0):
         return
     else:
         path.append(nd.last_move)
         nd=nd.parent
-        print(nd.robot_loc," parent")
         get_path(nd)
 
 def fill_node_cost(location :tuple):
@@ -62,6 +61,7 @@ def fill_node_cost(location :tuple):
 
 
 def check_goal(node : Node):
+    global final_cost,final_depth
     for i in range(len(node.butter_loc)):
         if(node.butter_loc[i] in goal_location):
             # print(node.butter_loc[i])
@@ -70,6 +70,8 @@ def check_goal(node : Node):
             node.butter_loc.remove(node.butter_loc[i])
             if(len(goal_location)==0):
                 get_path(node)
+                final_cost=node.cost
+                final_depth=node.depth
 
             # start = Node(node.robot_loc, node., None, None,node.cost)
             return node
@@ -127,7 +129,7 @@ def IDS(root : Node):
                     end=True
         i+=1
         now_tree_len = len(tree)
-        print(len(tree),i)
+        print(now_tree_len,previous_tree_len)
         if(now_tree_len==previous_tree_len):
             break
         if end== True:
@@ -211,12 +213,12 @@ def generate_children(node : Node):
 file_name=input()+".txt"
 
 read_from_file(file_name)
-
 start=Node(robot_location,butter_location,None,None,int(environment[robot_location[0]][robot_location[1]][0]))
-
 IDS(start)
+write_on_file("result"+file_name[4]+".txt")
 
-if(goal_location==0):
+
+if(len(goal_location)==0):
     print(path)
 else:
     print("can’t pass the butter")
