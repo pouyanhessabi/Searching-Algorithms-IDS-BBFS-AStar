@@ -29,10 +29,21 @@ path=[]
 #
 def get_path(node : Node):
     nd=node
-    while(nd.parnet!=None):
-        path.append(node.last_move)
-        nd=node.parent
-
+    # i=0
+    # print(node.robot_loc,"goal")
+    # while(i<nd.depth):
+    #     path.append(nd.last_move)
+    #     nd=node.parent
+    #     print(nd.robot_loc, "parent")
+    #     print(nd.parent.robot_loc,"par par")
+    #     i+=1
+    if(nd.depth==0):
+        return
+    else:
+        path.append(nd.last_move)
+        nd=nd.parent
+        print(nd.robot_loc," parent")
+        get_path(nd)
 
 def fill_node_cost(location :tuple):
     return int(environment[location[0]][location[1]][0])
@@ -41,7 +52,11 @@ def fill_node_cost(location :tuple):
 def check_goal(node : Node):
     for i in range(len(node.butter_loc)):
         if(node.butter_loc[i] in goal_location):
+            # print(node.butter_loc[i])
+            # print(node.parent.butter_loc)
             get_path(node)
+            goal_location.remove(node.butter_loc[i])
+
 
 
 def DFS(node : Node,maxDepth):
@@ -53,7 +68,6 @@ def DFS(node : Node,maxDepth):
         ch=generate_children(nd)
         for i in range(len(ch)):
             condition=True
-            # print(ch[i].location," childerenn")
             if(ch[i].depth<=maxDepth):
                 for j in range(len(tree)):
                     if (ch[i].robot_loc == tree[j].robot_loc and set(ch[i].butter_loc) == set(tree[j].butter_loc)):
@@ -74,13 +88,23 @@ def DFS(node : Node,maxDepth):
 
 
 def IDS(root : Node, limit):
-    for i in range(limit):
+    end=False
+    for i in range(limit+1):
         tree.clear()
         frontier.append(root)
         DFS(root,i)
         for i in range(len(tree)):
-            check_goal(tree[i])
-            print(tree[i].butter_loc, tree[i].robot_loc, tree[i].cost)
+            if(len(goal_location)>0):
+                check_goal(tree[i])
+            else:
+                end=True
+        if end== True:
+            break
+            # print(tree[i].butter_loc, tree[i].robot_loc, tree[i].depth)
+            # if(tree[i].robot_loc==(4,0)):
+            #      print(tree[i].parent.robot_loc)
+            # else:
+            #     print("noooooooooo")
         print("________________")
 
 def generate_children(node : Node):
@@ -177,6 +201,7 @@ IDS(start,12)
 
 
 print(path)
+print(len(path))
 
 # print(start.cost)
 #
