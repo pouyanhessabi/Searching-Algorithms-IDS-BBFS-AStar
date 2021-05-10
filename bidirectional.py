@@ -35,8 +35,10 @@ class NodeForGoal:
 
 environment = []
 frontier = []
+frontier_for_goal = []
 visited = []
-tree = []
+explored = []
+explored_for_goal = []
 robot_location = (0, 0)
 butter_location = []
 goal_location = []
@@ -109,12 +111,8 @@ def check_goal(node: Node):
 
 def BFS_for_robot(root: Node):
     # frontier.append(root)
-    if len(frontier) == 0 and len(tree) != 0:
+    if len(frontier) == 0 and len(explored) != 0:
         return
-    for i in range(len(goal_location)):
-        if root.butter_loc == goal_location[i]:
-            break
-
     else:
         tmp_check = True
         for i in range(len(frontier)):
@@ -128,16 +126,14 @@ def BFS_for_robot(root: Node):
                     tmp_check = False
                     break
         nd = frontier.pop(0)
-        tree.append(nd)
-        # tree.append(nd)
+        explored.append(nd)
         ch = generate_children(nd)
         for i in range(len(ch)):
             condition = True
-            # if ch[i].depth <= 1000:
-            for j in range(len(tree)):
-                if ch[i].robot_loc == tree[j].robot_loc and set(ch[i].butter_loc) == set(tree[j].butter_loc):
-                    if ch[i].cost < tree[j].cost:
-                        tree.pop(j)
+            for j in range(len(explored)):
+                if ch[i].robot_loc == explored[j].robot_loc and set(ch[i].butter_loc) == set(explored[j].butter_loc):
+                    if ch[i].cost < explored[j].cost:
+                        explored.pop(j)
                         pass
                     else:
                         condition = False
@@ -150,13 +146,51 @@ def BFS_for_robot(root: Node):
         # print("z" , frontier[0].robot_loc)
         # print("___________________________")
         print(nd.robot_loc, nd.depth, nd.butter_loc, nd.last_move)
-
         BFS_for_robot(nd)
+
+
+def BFS_for_goal(root: NodeForGoal, index: int):
+    if len(frontier_for_goal) == 0 and len(explored_for_goal) != 0:
+        return
+    else:
+        tmp_check = True
+        for i in range(len(frontier_for_goal)):
+            for j in range(len(frontier_for_goal)):
+                if i == j:
+                    break
+                if tmp_check and frontier_for_goal[i].goal_loc[index] == frontier_for_goal[j].goal_loc[index] and \
+                        frontier_for_goal[i].depth == frontier_for_goal[j].depth:
+                    frontier_for_goal.pop(i)
+                    tmp_check = False
+                    break
+        nd = frontier_for_goal.pop(0)
+        explored_for_goal.append(nd)
+        ch = generate_goal_children(nd, index)
+        for i in range(len(ch)):
+            condition = True
+            for j in range(len(explored_for_goal)):
+                if ch[i].goal_loc[index] == explored_for_goal[j].goal_loc[index] and set(ch[i].goal_loc[index]) == set(
+                        explored_for_goal[j].goal_loc[index]):
+                    if ch[i].cost < explored_for_goal[j].cost:
+                        explored_for_goal.pop(j)
+                    else:
+                        condition = False
+                    break
+            if condition:
+                # print("yeeeeeeee", ch[i].robot_loc)
+                frontier_for_goal.append(ch[i])
+
+        print("___________________")
+        # print("z" , frontier[0].robot_loc)
+        # print("___________________________")
+        print(nd.goal_loc[index], nd.depth, nd.last_move)
+        BFS_for_goal(nd, index)
 
 
 def bid():
     for i in range(len(goal_location)):
-        BFS_for_robot()
+        pass
+        # BFS_for_robot()
 
 
 def generate_children(node: Node):
@@ -182,17 +216,17 @@ def generate_children(node: Node):
             if not (up in neighbor_butter_location):
                 children.append(Node(up, node.butter_loc, "u", node, fill_node_cost(up)))
 
-    if 0 <= down[0] < x and down[1] >= 0 and down[1] < y:
+    if 0 <= down[0] < x and 0 <= down[1] < y:
         if not (down in forbidden_location):
             if not (down in neighbor_butter_location):
                 children.append(Node(down, node.butter_loc, "d", node, fill_node_cost(down)))
 
-    if left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y:
+    if 0 <= left[0] < x and 0 <= left[1] < y:
         if not (left in forbidden_location):
             if not (left in neighbor_butter_location):
                 children.append(Node(left, node.butter_loc, "l", node, fill_node_cost(left)))
 
-    if right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y:
+    if 0 <= right[0] < x and 0 <= right[1] < y:
         if not (right in forbidden_location):
             if not (right in neighbor_butter_location):
                 children.append(Node(right, node.butter_loc, "r", node, fill_node_cost(right)))
@@ -222,16 +256,16 @@ def generate_children(node: Node):
 
 def generate_goal_children(node: NodeForGoal, index: int):
     goal_children = []
-    goal_neighbors = []
-    up = (node.goal_loc[index][0], node.goal_loc[index][1])
-    goal_neighbors.append(up)
+    # goal_neighbors = []
 
+    up = (node.goal_loc[index][0] - 1, node.goal_loc[index][1])
+    # goal_neighbors.append(up)
     down = (node.goal_loc[index][0] + 1, node.goal_loc[index][1])
-    goal_neighbors.append(down)
+    # goal_neighbors.append(down)
     left = (node.goal_loc[index][0], node.goal_loc[index][1] - 1)
-    goal_neighbors.append(left)
+    # goal_neighbors.append(left)
     right = (node.goal_loc[index][0], node.goal_loc[index][1] + 1)
-    goal_neighbors.append(right)
+    # goal_neighbors.append(right)
 
     # for i in range(4):
     #     for j in range(len(butter_location)):
@@ -250,29 +284,29 @@ def generate_goal_children(node: NodeForGoal, index: int):
         if not (up in forbidden_location):
             temp = node.goal_loc.copy()
             temp.remove(node.goal_loc[index])
-            temp.append(up)
+            temp.insert(index, up)
             goal_children.append(NodeForGoal(temp, "u", node, fill_node_cost(up)))
 
-    if 0 <= up[0] < x and 0 <= up[1] < y:
-        if not (up in forbidden_location):
+    if 0 <= down[0] < x and 0 <= down[1] < y:
+        if not (down in forbidden_location):
             temp = node.goal_loc.copy()
             temp.remove(node.goal_loc[index])
-            temp.append(up)
-            goal_children.append(NodeForGoal(temp, "u", node, fill_node_cost(up)))
+            temp.insert(index, down)
+            goal_children.append(NodeForGoal(temp, "d", node, fill_node_cost(down)))
 
-    if 0 <= up[0] < x and 0 <= up[1] < y:
-        if not (up in forbidden_location):
+    if 0 <= left[0] < x and 0 <= left[1] < y:
+        if not (left in forbidden_location):
             temp = node.goal_loc.copy()
             temp.remove(node.goal_loc[index])
-            temp.append(up)
-            goal_children.append(NodeForGoal(temp, "u", node, fill_node_cost(up)))
+            temp.insert(index, left)
+            goal_children.append(NodeForGoal(temp, "l", node, fill_node_cost(left)))
 
-    if 0 <= up[0] < x and 0 <= up[1] < y:
-        if not (up in forbidden_location):
+    if 0 <= right[0] < x and 0 <= right[1] < y:
+        if not (right in forbidden_location):
             temp = node.goal_loc.copy()
             temp.remove(node.goal_loc[index])
-            temp.append(up)
-            goal_children.append(NodeForGoal(temp, "u", node, fill_node_cost(up)))
+            temp.insert(index, right)
+            goal_children.append(NodeForGoal(temp, "r", node, fill_node_cost(right)))
     #
     #
     # if 0 <= down[0] < x and 0 <= down[1] < y:
@@ -310,15 +344,19 @@ def generate_goal_children(node: NodeForGoal, index: int):
     return goal_children
 
 
-# for limit in range(1,(x*y)):
-# file_name = input() + ".txt"
-file_name = "test1.txt"
+file_name = "test3.txt"
 read_from_file(file_name)
 start = Node(robot_location, butter_location, None, None, int(environment[robot_location[0]][robot_location[1]][0]))
 # purpose = NodeForGoal(robot_location, butter_location, goal_location, None, None, 0)
 frontier.append(start)
-BFS_for_robot(start)
-# IDS(start)
+# BFS_for_robot(start)
+purpose1 = NodeForGoal(goal_location, None, None, int(environment[goal_location[0][0]][goal_location[0][1]][0]))
+frontier_for_goal.append(purpose1)
+BFS_for_goal(purpose1, 0)
+print("tamoom shod avvali \n\n\n\n")
+purpose2 = NodeForGoal(goal_location, None, None, int(environment[goal_location[1][0]][goal_location[1][1]][0]))
+frontier_for_goal.append(purpose2)
+BFS_for_goal(purpose2, 1)
 
 write_on_file("result" + file_name[4] + ".txt")
 
