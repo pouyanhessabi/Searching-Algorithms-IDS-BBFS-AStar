@@ -201,9 +201,10 @@ file_name = input() + ".txt"
 read_from_file(file_name)
 start = Node(robot_location, butter_location, None, None, 0)
 IDS(start)
-write_on_file("result" + file_name[4] + ".txt")
+# write_on_file("result" + file_name[4] + ".txt")
 
-# if (len(goal_location) == 0):
-#     print(path)
-# else:
-#     print("can’t pass the butter")
+
+if (len(goal_location) == 0):
+    print(path)
+else:
+    print("can’t pass the butter")
