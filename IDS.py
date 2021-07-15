@@ -52,11 +52,14 @@ def read_from_file(file_name: str):
 
 def write_on_file(file_name):
     f = open(file_name, "w")
-    for i in range(len(path), 0, -1):
-        f.write(path[i - 1] + " ")
-    f.write("\n")
-    f.write(str(final_cost) + "\n")
-    f.write(str(final_depth) + "\n")
+    if (len(goal_location) == 0):
+        for i in range(len(path), 0, -1):
+            f.write(path[i - 1] + " ")
+        f.write("\n")
+        f.write(str(final_cost) + "\n")
+        f.write(str(final_depth) + "\n")
+    else:
+        f.write("can’t pass the butter")
 
 
 def get_path(node: Node):
@@ -201,10 +204,4 @@ file_name = input() + ".txt"
 read_from_file(file_name)
 start = Node(robot_location, butter_location, None, None, 0)
 IDS(start)
-# write_on_file("result" + file_name[4] + ".txt")
-
-
-if (len(goal_location) == 0):
-    print(path)
-else:
-    print("can’t pass the butter")
+write_on_file("result" + file_name[4] + ".txt")

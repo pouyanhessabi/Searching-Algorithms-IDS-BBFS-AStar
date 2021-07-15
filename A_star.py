@@ -4,11 +4,11 @@ sys.setrecursionlimit(5000)
 
 
 class Node:
-    def __init__(self, robot_loc: tuple, butter_loc: list,h :list, last_move: str = None, parent=None, cost: int = 0,
-                 depth: int = 0 ):
+    def __init__(self, robot_loc: tuple, butter_loc: list, h: list, last_move: str = None, parent=None, cost: int = 0,
+                 depth: int = 0):
         self.robot_loc = robot_loc
         self.butter_loc = butter_loc
-        self.h=h
+        self.h = h
         self.parent = parent
         self.last_move = last_move
         if parent:
@@ -18,7 +18,8 @@ class Node:
             self.cost = cost
             self.depth = 0
 
-heuristic=[]
+
+heuristic = []
 environment = []
 frontier = []
 explored = []
@@ -32,19 +33,21 @@ final_depth = 0
 x = 0
 y = 0
 
+
 def fill_heuristic(env):
-    h=[]
-    h1=[]
+    h = []
+    h1 = []
     for i in range(x):
         for j in range(y):
             for k in range(len(goal_location)):
                 # e=goal_location[k]-env[i][j]
-                e=(abs(goal_location[k][0]-i)+abs(goal_location[k][1]-j))
+                e = (abs(goal_location[k][0] - i) + abs(goal_location[k][1] - j))
                 h.append(e)
             h1.append(h.copy())
             h.clear()
         heuristic.append(h1.copy())
         h1.clear()
+
 
 def read_from_file(file_name: str):
     global x, y, robot_location
@@ -67,11 +70,14 @@ def read_from_file(file_name: str):
 
 def write_on_file(file_name):
     f = open(file_name, "w")
-    for i in range(len(path), 0, -1):
-        f.write(path[i - 1] + " ")
-    f.write("\n")
-    f.write(str(final_cost) + "\n")
-    f.write(str(final_depth) + "\n")
+    if (len(goal_location) == 0):
+        for i in range(len(path), 0, -1):
+            f.write(path[i - 1] + " ")
+        f.write("\n")
+        f.write(str(final_cost) + "\n")
+        f.write(str(final_depth) + "\n")
+    else:
+        f.write("can’t pass the butter")
 
 
 def get_path(node: Node):
@@ -102,27 +108,25 @@ def check_goal(node: Node):
     return None
 
 
-def find_min(fron,goal_number):
-
-    min=fron[0].h[goal_number]+fron[0].cost
-    min_node=fron[0]
+def find_min(fron, goal_number):
+    min = fron[0].h[goal_number] + fron[0].cost
+    min_node = fron[0]
     for i in range(len(fron)):
-        if(min>fron[i].h[goal_number]+fron[i].cost):
-            min=fron[i].h[goal_number]+fron[i].cost
-            min_node=fron[i]
+        if (min > fron[i].h[goal_number] + fron[i].cost):
+            min = fron[i].h[goal_number] + fron[i].cost
+            min_node = fron[i]
     return min_node
 
 
-
-def A_star(node : Node):
+def A_star(node: Node):
     frontier.append(node)
-    p=0
+    p = 0
     end = False
     while frontier:
-        min_node=find_min(frontier,p)
+        min_node = find_min(frontier, p)
         frontier.remove(min_node)
         explored.append(min_node)
-        new_root=check_goal(min_node)
+        new_root = check_goal(min_node)
         if (new_root != None):
             if (len(goal_location) > 0):
                 explored.clear()
@@ -132,7 +136,7 @@ def A_star(node : Node):
             end = True
         if end:
             break
-        ch=generate_children(min_node)
+        ch = generate_children(min_node)
         for i in range(len(ch)):
             condition = True
             for j in range(len(explored)):
@@ -145,17 +149,6 @@ def A_star(node : Node):
                     break
             if (condition):
                 frontier.append(ch[i])
-
-
-
-
-
-
-
-
-
-
-
 
 
 def generate_children(node: Node):
@@ -179,22 +172,25 @@ def generate_children(node: Node):
     if (up[0] >= 0 and up[0] < x and up[1] >= 0 and up[1] < y):
         if (not (up in forbidden_location)):
             if (not (up in neighbor_butter_location)):
-                children.append(Node(up, node.butter_loc ,heuristic[up[0]][up[1]], "u", node, fill_node_cost(up)))
+                children.append(Node(up, node.butter_loc, heuristic[up[0]][up[1]], "u", node, fill_node_cost(up)))
 
     if (down[0] >= 0 and down[0] < x and down[1] >= 0 and down[1] < y):
         if (not (down in forbidden_location)):
             if (not (down in neighbor_butter_location)):
-                children.append(Node(down, node.butter_loc ,heuristic[down[0]][down[1]], "d", node, fill_node_cost(down)))
+                children.append(
+                    Node(down, node.butter_loc, heuristic[down[0]][down[1]], "d", node, fill_node_cost(down)))
 
     if (left[0] >= 0 and left[0] < x and left[1] >= 0 and left[1] < y):
         if (not (left in forbidden_location)):
             if (not (left in neighbor_butter_location)):
-                children.append(Node(left, node.butter_loc ,heuristic[left[0]][left[1]], "l", node, fill_node_cost(left)))
+                children.append(
+                    Node(left, node.butter_loc, heuristic[left[0]][left[1]], "l", node, fill_node_cost(left)))
 
     if (right[0] >= 0 and right[0] < x and right[1] >= 0 and right[1] < y):
         if (not (right in forbidden_location)):
             if (not (right in neighbor_butter_location)):
-                children.append(Node(right, node.butter_loc ,heuristic[right[0]][right[1]], "r", node, fill_node_cost(right)))
+                children.append(
+                    Node(right, node.butter_loc, heuristic[right[0]][right[1]], "r", node, fill_node_cost(right)))
 
     if (len(neighbor_butter_location) != 0):
         for i in neighbor_butter_location:
@@ -215,7 +211,7 @@ def generate_children(node: Node):
                     temp = node.butter_loc.copy()
                     temp.remove(i)
                     temp.append(b_loc)
-                    children.append(Node(i, temp ,heuristic[i[0]][i[1]], action, node, fill_node_cost(i)))
+                    children.append(Node(i, temp, heuristic[i[0]][i[1]], action, node, fill_node_cost(i)))
     return children
 
 
@@ -223,9 +219,8 @@ file_name = input() + ".txt"
 
 read_from_file(file_name)
 
-
 # print(heuristic)
-start = Node(robot_location, butter_location,heuristic[robot_location[0]][robot_location[1]],None, None, 0)
+start = Node(robot_location, butter_location, heuristic[robot_location[0]][robot_location[1]], None, None, 0)
 A_star(start)
 # ch=generate_children(start)
 # for i in range(len(ch)):

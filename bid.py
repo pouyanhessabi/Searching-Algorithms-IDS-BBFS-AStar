@@ -18,7 +18,6 @@ class Node:
             self.depth = 0
 
 
-
 environment = []
 frontier = []
 frontier_for_goal = []
@@ -35,8 +34,10 @@ final_cost = 0
 final_depth = 0
 x = 0
 y = 0
-path_g=[]
-final_robot=(-1,-1)
+path_g = []
+final_robot = (-1, -1)
+
+
 def read_from_file(file_name: str):
     global x, y, robot_location
     f = open(file_name, "r")
@@ -57,29 +58,34 @@ def read_from_file(file_name: str):
 
 def write_on_file(file_name):
     f = open(file_name, "w")
-    for i in range(len(path)):
-        f.write(path[i] + " ")
-    f.write("\n")
-    f.write(str(final_cost) + "\n")
-    f.write(str(final_depth) + "\n")
-def get_final_loc(node_g:Node):
-    nd_g=node_g
+    if (len(goal_location) == 0):
+        for i in range(len(path)):
+            f.write(path[i] + " ")
+        f.write("\n")
+        f.write(str(final_cost) + "\n")
+        f.write(str(final_depth) + "\n")
+    else:
+        f.write("can’t pass the butter")
+
+
+def get_final_loc(node_g: Node):
+    nd_g = node_g
     global final_robot
     if nd_g.depth == 0:
-        final_robot=nd_g.robot_loc
+        final_robot = nd_g.robot_loc
         # print(nd_g.robot_loc,"sssssssssssssssssssssssssssssssssssssssssssssss")
         return
     else:
-        nd_g=nd_g.parent
+        nd_g = nd_g.parent
         get_final_loc(nd_g)
 
 
-def get_path(node: Node,node_g : Node):
+def get_path(node: Node, node_g: Node):
     nd = node
-    nd_g=node_g
+    nd_g = node_g
     if nd.depth == 0 and nd_g.depth == 0:
         path_temp.reverse()
-        for i in range (len(path_temp)):
+        for i in range(len(path_temp)):
             path.append(path_temp[i])
         for i in range(len(path_g)):
             path.append(path_g[i])
@@ -87,58 +93,48 @@ def get_path(node: Node,node_g : Node):
         path_temp.clear()
         return
     else:
-        if(nd.depth != 0):
+        if (nd.depth != 0):
             path_temp.append(nd.last_move)
             nd = nd.parent
-        elif(nd_g.depth != 0):
+        elif (nd_g.depth != 0):
             path_g.append(nd_g.last_move)
-            nd_g=nd_g.parent
-        get_path(nd,nd_g)
+            nd_g = nd_g.parent
+        get_path(nd, nd_g)
 
 
 def fill_node_cost(location: tuple):
     return int(environment[location[0]][location[1]][0])
 
 
-def check_goal(node_g : Node ,node: Node):
+def check_goal(node_g: Node, node: Node):
     global final_cost, final_depth
     for i in range(len(node.butter_loc)):
         for j in range(len(node_g.butter_loc)):
             if node.butter_loc[i] == node_g.butter_loc[j] and node.robot_loc == node_g.robot_loc:
-                # print(node.butter_loc[i],node_g.butter_loc[j])
+                # print(node.butter_loc[i],node.robot_loc)
                 # print(node.robot_loc ,node_g.robot_loc)
                 # print(node.butter_loc[i])
                 # print(node.parent.butter_loc)
+                # print(node.cost,node_g.cost)
+                final_cost += (node.cost + node_g.cost - fill_node_cost(goal_location[0]))
+
                 goal_location.pop(0)
                 node.butter_loc.remove(node.butter_loc[i])
                 get_final_loc(node_g)
                 get_path(node, node_g)
 
-
-                final_cost += (node.cost+node_g.cost-int(environment[node.robot_loc[0]][node.robot_loc[1]][0]))
-                final_depth += (node.depth+node_g.cost-1)
+                final_depth += (node.depth + node_g.depth)
 
                 # start = Node(node.robot_loc, node., None, None,node.cost)
 
                 return final_robot
-    return (-1,-1)
+    return (-1, -1)
 
 
-def BFS_for_robot():
+def BID():
     if (len(frontier) == 0 and len(explored) != 0) or len(frontier_for_goal) == 0 and len(explored_for_goal) != 0:
         return
     else:
-        tmp_check = True
-        for i in range(len(frontier)):
-            for j in range(len(frontier)):
-                if i == j:
-                    break
-                if tmp_check and frontier[i].robot_loc == frontier[j].robot_loc and frontier[i].depth == frontier[
-                    j].depth and \
-                        frontier[i].butter_loc == frontier[j].butter_loc:
-                    frontier.pop(i)
-                    tmp_check = False
-                    break
         nd_r = frontier.pop(0)
         # print(nd_r.robot_loc, "robot")
         explored.append(nd_r)
@@ -156,21 +152,6 @@ def BFS_for_robot():
             if condition:
                 frontier.append(ch[i])
 
-        # print("___________________")
-        # print("z" , frontier[0].robot_loc)
-        # print("___________________________")
-        # print(nd_r.robot_loc, nd_r.depth, nd_r.butter_loc, nd_r.last_move)
-        # BFS_for_robot(nd_r)
-        # tmp_check = True
-        # for i in range(len(frontier_for_goal)):
-        #     for j in range(len(frontier_for_goal)):
-        #         if i == j:
-        #             break
-        #         if tmp_check and frontier_for_goal[i].goal_loc[index] == frontier_for_goal[j].goal_loc[index] and \
-        #                 frontier_for_goal[i].depth == frontier_for_goal[j].depth:
-        #             frontier_for_goal.pop(i)
-        #             tmp_check = False
-        #             break
         nd_g = frontier_for_goal.pop(0)
         # print(nd_g.robot_loc, "goal")
         explored_for_goal.append(nd_g)
@@ -178,7 +159,8 @@ def BFS_for_robot():
         for i in range(len(ch)):
             condition = True
             for j in range(len(explored)):
-                if ch[i].robot_loc == explored_for_goal[j].robot_loc and set(ch[i].butter_loc) == set(explored_for_goal[j].butter_loc):
+                if ch[i].robot_loc == explored_for_goal[j].robot_loc and set(ch[i].butter_loc) == set(
+                        explored_for_goal[j].butter_loc):
                     if ch[i].cost < explored_for_goal[j].cost:
                         explored_for_goal.pop(j)
                         pass
@@ -187,66 +169,19 @@ def BFS_for_robot():
                     break
             if condition:
                 frontier_for_goal.append(ch[i])
-        cand=False
+        cond = False
         for k in range(len(frontier_for_goal)):
             for p in range(len(frontier)):
-                new_root=check_goal(frontier_for_goal[k] , frontier[p])
+                new_root = check_goal(frontier_for_goal[k], frontier[p])
                 # print(new_root,"newwwwwwwwwwwww")
-                if(new_root!=(-1,-1)):
-                    cand=True
+                if (new_root != (-1, -1)):
+                    cond = True
                     # print(new_root,"ssssssssssssssszxs xz")
                     break
-        if(cand):
+        if (cond):
             return new_root
 
-        BFS_for_robot()
-
-
-# def BFS_for_goal(root: NodeForGoal, index: int):
-#     if len(frontier_for_goal) == 0 and len(explored_for_goal) != 0:
-#         return
-#     else:
-#         tmp_check = True
-#         for i in range(len(frontier_for_goal)):
-#             for j in range(len(frontier_for_goal)):
-#                 if i == j:
-#                     break
-#                 if tmp_check and frontier_for_goal[i].goal_loc[index] == frontier_for_goal[j].goal_loc[index] and \
-#                         frontier_for_goal[i].depth == frontier_for_goal[j].depth:
-#                     frontier_for_goal.pop(i)
-#                     tmp_check = False
-#                     break
-#         nd = frontier_for_goal.pop(0)
-#         explored_for_goal.append(nd)
-#         ch = generate_goal_children(nd, index)
-#         for i in range(len(ch)):
-#             condition = True
-#             for j in range(len(explored_for_goal)):
-#                 if ch[i].goal_loc[index] == explored_for_goal[j].goal_loc[index] and set(ch[i].goal_loc[index]) == set(
-#                         explored_for_goal[j].goal_loc[index]):
-#                     if ch[i].cost < explored_for_goal[j].cost:
-#                         explored_for_goal.pop(j)
-#                     else:
-#                         condition = False
-#                     break
-#             if condition:
-#                 frontier_for_goal.append(ch[i])
-#
-#         print("___________________")
-#         # print("z" , frontier[0].robot_loc)
-#         # print("___________________________")
-#         print(nd.goal_loc[index], nd.depth, nd.last_move)
-#         BFS_for_goal(nd, index)
-
-
-# def bid():
-#     purpose = []
-#     for i in range(len(goal_location)):
-#         purpose.append(
-#             NodeForGoal(goal_location, None, None, int(environment[goal_location[0][0]][goal_location[0][1]][0])))
-#         frontier_for_goal.append(purpose[i])
-#         BFS_for_goal(purpose[i], i)
-#         print("tamoom shod avvali \n\n\n\n")
+        BID()
 
 
 def generate_children(node: Node):
@@ -351,7 +286,7 @@ def generate_goal_children(node: Node):
     if len(neighbor_butter_location) != 0:
         for i in neighbor_butter_location:
             if i == up:
-                r_loc = ( node.robot_loc[0] + 1, node.robot_loc[1])
+                r_loc = (node.robot_loc[0] + 1, node.robot_loc[1])
                 action = "u"
             elif i == down:
                 r_loc = (node.robot_loc[0] - 1, node.robot_loc[1])
@@ -374,26 +309,25 @@ def generate_goal_children(node: Node):
 file_name = input() + ".txt"
 
 read_from_file(file_name)
-n=len(goal_location)
+n = len(goal_location)
 start = Node(robot_location, butter_location, None, None, 0)
 for j in range(n):
-    temp=[]
+    temp = []
     frontier.append(start)
-    goal = Node(goal_location[0], butter_location, None, None,0)
-    ch=generate_children(goal)
+    goal = Node(goal_location[0], butter_location, None, None, 0)
+    ch = generate_children(goal)
     temp.append(goal_location[0])
     for i in range(len(ch)):
         # print(ch[i].robot_loc)
-        frontier_for_goal.append(Node(ch[i].robot_loc, temp, None, None,0))
-    BFS_for_robot()
+        frontier_for_goal.append(Node(ch[i].robot_loc, temp, None, None, fill_node_cost(ch[i].robot_loc)))
+    BID()
     start = Node(final_robot, butter_location, None, None, 0)
     # print(start.robot_loc,"ssssssssssssssssgvedvszbsssssssssssssss")
-    final_robot=(-1,-1)
+    final_robot = (-1, -1)
     frontier_for_goal.clear()
     frontier.clear()
     explored_for_goal.clear()
     explored.clear()
-
 
 write_on_file("result" + file_name[4] + ".txt")
 
